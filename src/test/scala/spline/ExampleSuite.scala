@@ -1,4 +1,4 @@
-package example
+package spline
 
 class ExampleSuite extends munit.FunSuite:
 
