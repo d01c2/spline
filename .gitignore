@@ -15,6 +15,7 @@ project/local-plugins.sbt
 .bsp
 .metals
 .bloop
+metals.sbt
 
 # Scala-IDE specific
 .scala_dependencies
