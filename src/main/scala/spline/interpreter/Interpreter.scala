@@ -83,8 +83,14 @@ object Interpreter {
             v2 <- eval(e2, st)
             if v1 != v2
           } yield st
-    case CBool(b)     => if b then sts else Set.empty
-    case CNot(c)      => eval(c, sts)
+    case CBool(b) => if b then sts else Set.empty
+    case CNot(c) =>
+      c match
+        case CCmp(cmp, e1, e2) => eval(CCmp(cmp.negate, e1, e2), sts)
+        case CBool(b)          => eval(CBool(!b), sts)
+        case CNot(c)           => eval(c, sts)
+        case CAnd(c1, c2)      => eval(COr(CNot(c1), CNot(c2)), sts)
+        case COr(c1, c2)       => eval(CAnd(CNot(c1), CNot(c2)), sts)
     case CAnd(c1, c2) => eval(c1, sts) intersect eval(c2, sts)
     case COr(c1, c2)  => eval(c1, sts) ++ eval(c2, sts)
 
@@ -100,7 +106,7 @@ object Interpreter {
       eval(s1, eval(c, sts)) ++ eval(s2, eval(CNot(c), sts))
     case SLoop(c, s) =>
       def F(X: Set[State]): Set[State] = sts ++ eval(s, eval(c, X))
-      eval(CNot(c), fixpoint(F)(Set.empty))
+      eval(CNot(c), fixpoint(F)(sts))
     case SNop       => sts
     case SAssert(c) => eval(c, sts)
 }

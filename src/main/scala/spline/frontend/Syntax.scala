@@ -63,6 +63,15 @@ enum Cmp {
     case Gt  => ">"
     case Eq  => "=="
     case Neq => "!="
+
+  // the negation of a comparison
+  def negate: Cmp = this match
+    case Leq => Gt
+    case Geq => Lt
+    case Lt  => Geq
+    case Gt  => Leq
+    case Eq  => Neq
+    case Neq => Eq
 }
 
 enum Cond {
@@ -90,7 +99,13 @@ enum Cond {
 type Value = BigInt
 
 // state
-type State = Map[String, Value]
+opaque type State = Map[String, Value]
+object State:
+  def empty: State = Map.empty
+  def apply(kvs: (String, Value)*): State = Map(kvs*)
+  extension (s: State)
+    def getOrElse(x: String, v: => Value): Value = s.getOrElse(x, v)
+    def updated(x: String, v: Value): State = s.updated(x, v)
 
 // parsers
 object Stat extends Parser.From(Parser.stat)
