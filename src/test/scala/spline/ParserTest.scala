@@ -1,8 +1,8 @@
 package spline
 
-import spline.lang.*
+import spline.frontend.*
 
-class ParserSuite extends munit.FunSuite:
+class ParserTest extends munit.FunSuite:
   private def parseExpr(input: String): Expr = Expr(input)
   private def parseCond(input: String): Cond = Cond(input)
   private def parseStat(input: String): Stat = Stat(input)
@@ -29,7 +29,7 @@ class ParserSuite extends munit.FunSuite:
     val expected = Expr.EBOp(
       BOp.Add,
       Expr.ENeg(Expr.EVar("x")),
-      Expr.EInput(Interval(BigInt(0), BigInt(10))),
+      Expr.EInput(BigInt(0), BigInt(10)),
     )
     assertEquals(expr2, expected.str)
     assertEquals(parsed, expected)

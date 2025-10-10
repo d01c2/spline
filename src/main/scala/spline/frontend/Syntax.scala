@@ -1,4 +1,4 @@
-package spline.lang
+package spline.frontend
 
 enum Stat {
   // assignment
@@ -33,10 +33,6 @@ enum BOp {
     case Div => "/"
 }
 
-case class Interval(c1: Value, c2: Value) {
-  override def toString: String = s"[$c1, $c2]"
-}
-
 enum Expr {
   // variable
   case EVar(v: String)
@@ -46,8 +42,8 @@ enum Expr {
   case ENeg(e: Expr)
   // binary operation
   case EBOp(bop: BOp, e1: Expr, e2: Expr)
-  // input variable with interval
-  case EInput(itv: Interval)
+  // input
+  case EInput(c1: Value, c2: Value)
 
   // the string form of an expression
   def str: String = this match
@@ -55,7 +51,7 @@ enum Expr {
     case ENum(c)           => c.toString
     case ENeg(e)           => s"-${e.str}"
     case EBOp(bop, e1, e2) => s"${e1.str} $bop ${e2.str}"
-    case EInput(itv)       => itv.toString
+    case EInput(c1, c2)    => s"[$c1, $c2]"
 }
 
 enum Cmp {

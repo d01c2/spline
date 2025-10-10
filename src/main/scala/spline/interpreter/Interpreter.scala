@@ -1,7 +1,9 @@
-package spline.lang
+package spline.interpreter
 
 import spline.utils.*
+import spline.frontend.*
 
+/** Collecting Concrete Interpreter */
 object Interpreter {
   import Expr.*
   def eval(e: Expr, st: State): Set[Value] = e match
@@ -31,7 +33,7 @@ object Interpreter {
             v2 <- eval(e2, st)
             if v2 != 0
           } yield v1 / v2
-    case EInput(Interval(c1, c2)) =>
+    case EInput(c1, c2) =>
       if c1 > c2 then error(s"invalid interval: [$c1, $c2]")
       else (c1 to c2).toSet
 

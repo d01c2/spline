@@ -1,9 +1,8 @@
-package spline.lang
+package spline.frontend
 
 import spline.utils.*
 import scala.util.parsing.combinator.*
 
-// TODO: test parser with realistic examples
 object Parser extends RegexParsers with PackratParsers {
   type P[+T] = PackratParser[T]
   class From[T](p: Parser[T]) {
@@ -59,7 +58,7 @@ object Parser extends RegexParsers with PackratParsers {
     lazy val e0: P[Expr] =
       (num ^^ (n => ENum(n))) |
       ("[" ~> num ~ ("," ~> num) <~ "]" ^^ {
-        case c1 ~ c2 => EInput(Interval(c1, c2))
+        case c1 ~ c2 => EInput(c1, c2)
       }) |
       (ident ^^ (v => EVar(v)))
     lazy val e1: P[Expr] = ("-" ~> e1 ^^ (ENeg(_))) | e0
