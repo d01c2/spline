@@ -33,9 +33,6 @@ trait AbsDomain[Elem] {
   extension (x: AbsValue) {
     // partial order
     def ⊑(y: AbsValue): Boolean
-    def ⊒(y: AbsValue): Boolean = y ⊑ x
-    def ⊐(y: AbsValue): Boolean = !(x ⊑ y)
-    def ⊏(y: AbsValue): Boolean = !(x ⊒ y)
 
     // join and meet operations
     def ⊔(y: AbsValue): AbsValue
@@ -49,9 +46,6 @@ trait AbsDomain[Elem] {
     // partial order
     def ⊑(y: AbsState): Boolean =
       (x.keySet ++ y.keySet).forall(k => x(k) ⊑ y(k))
-    def ⊒(y: AbsState): Boolean = y ⊑ x
-    def ⊐(y: AbsState): Boolean = !(x ⊑ y)
-    def ⊏(y: AbsState): Boolean = !(x ⊒ y)
 
     // join and meet operations
     def ⊔(y: AbsState): AbsState =
@@ -78,7 +72,7 @@ trait AbsDomain[Elem] {
     case EInput(c1, c2)    => alpha((c1 to c2).toSet)
 
   def transfer(c: Cond, st: AbsState): AbsState = c match
-    case CCmp(cmp, e1, e2) => ??? // TODO: Condition Abstraction
+    case CCmp(cmp, e1, e2) => st
     case CBool(b)          => if b then st else Map.empty
     case CNot(c) =>
       c match
