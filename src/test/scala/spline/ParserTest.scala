@@ -1,12 +1,8 @@
 package spline
 
-import spline.frontend.*
+import spline.utils.TestUtils.*
 
 class ParserTest extends munit.FunSuite:
-  private def parseExpr(input: String): Expr = Expr(input)
-  private def parseCond(input: String): Cond = Cond(input)
-  private def parseStat(input: String): Stat = Stat(input)
-
   test("expr: arithmetic precedence and associativity") {
     val expected = "1 + 2 * 3 - 4"
     val actual = parseExpr(expected).str

@@ -2,12 +2,9 @@ package spline
 
 import spline.frontend.*
 import spline.interpreter.*
+import spline.utils.TestUtils.*
 
 class InterpreterTest extends munit.FunSuite:
-  private def parseExpr(input: String): Expr = Expr(input)
-  private def parseCond(input: String): Cond = Cond(input)
-  private def parseStat(input: String): Stat = Stat(input)
-
   test("expr: division by zero") {
     val expected = Set[Value]()
     val actual = Interpreter.eval(parseExpr("1 + 2 / 0"), State())
