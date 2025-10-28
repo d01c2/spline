@@ -98,5 +98,103 @@ given SignDomain: AbsDomain[Sign] with {
           case (PosOrZero, NegOrZero)    => NegOrZero
           case (NegOrZero, PosOrZero)    => NegOrZero
           case _                         => Top
-
+  import Expr.*, Cond.*, Stat.*
+  override def transfer(c: Cond, st: Map[String, Sign]): AbsState =
+    c match
+      case CCmp(cmp, e1, e2) =>
+        (cmp, e1, e2) match
+          case (Cmp.Leq, EVar(v), ENum(0)) =>
+            st(v) match
+              case PosOrZero | Zero => st.updated(v, Zero)
+              case NegOrZero | Top  => st.updated(v, NegOrZero)
+              case _                => Map.empty
+          case (Cmp.Leq, EVar(v), EVar(w)) =>
+            val sign1 = st(v)
+            val sign2 = st(w)
+            val a =
+              sign1 match
+                case Zero | PosOrZero => st.updated(w, PosOrZero)
+                case _                => st
+            val b =
+              sign2 match
+                case Zero | NegOrZero => st.updated(v, NegOrZero)
+                case _                => st
+            a ⊓ b
+          case (Cmp.Geq, EVar(v), ENum(0)) =>
+            st(v) match
+              case NegOrZero | Zero => st.updated(v, Zero)
+              case PosOrZero | Top  => st.updated(v, PosOrZero)
+              case _                => Map.empty
+          case (Cmp.Geq, EVar(v), EVar(w)) =>
+            val sign1 = st(v)
+            val sign2 = st(w)
+            val a = sign1 match
+              case Zero | NegOrZero => st.updated(w, NegOrZero)
+              case _                => st
+            val b = sign2 match
+              case Zero | PosOrZero => st.updated(v, PosOrZero)
+              case _                => st
+            a ⊓ b
+          case (Cmp.Lt, EVar(v), ENum(0)) =>
+            st(v) match
+              case NegOrZero | Zero => Map.empty
+              case PosOrZero | Top  => st.updated(v, PosOrZero)
+              case _                => Map.empty
+          case (Cmp.Lt, EVar(v), EVar(w)) =>
+            val sign1 = st(v)
+            val sign2 = st(w)
+            val a = sign1 match
+              case Zero | NegOrZero => Map.empty
+              case PosOrZero | Top  => st.updated(w, PosOrZero)
+              case _                => st
+            val b = sign2 match
+              case Zero | PosOrZero => Map.empty
+              case NegOrZero | Top  => st.updated(v, NegOrZero)
+              case _                => st
+            a ⊓ b
+          case (Cmp.Gt, EVar(v), ENum(0)) =>
+            st(v) match
+              case PosOrZero | Zero => Map.empty
+              case NegOrZero | Top  => st.updated(v, NegOrZero)
+              case _                => Map.empty
+          case (Cmp.Gt, EVar(v), EVar(w)) =>
+            val sign1 = st(v)
+            val sign2 = st(w)
+            val a = sign1 match
+              case Zero | PosOrZero => Map.empty
+              case NegOrZero | Top  => st.updated(w, NegOrZero)
+              case _                => st
+            val b = sign2 match
+              case Zero | NegOrZero => Map.empty
+              case PosOrZero | Top  => st.updated(v, PosOrZero)
+              case _                => st
+            a ⊓ b
+          case (Cmp.Eq, EVar(v), ENum(0)) =>
+            st(v) match
+              case Bottom => Map.empty
+              case _      => st.updated(v, Zero)
+          case (Cmp.Eq, EVar(v), EVar(w)) =>
+            val sign1 = st(v)
+            val sign2 = st(w)
+            val a = sign1 match
+              case Bottom => Map.empty
+              case _      => st.updated(w, sign1)
+            val b = sign2 match
+              case Bottom => Map.empty
+              case _      => st.updated(v, sign2)
+            a ⊓ b
+          case (Cmp.Neq, EVar(v), ENum(0)) =>
+            st(v) match
+              case Zero   => Map.empty
+              case Bottom => Map.empty
+              case _      => st
+          case (Cmp.Neq, EVar(v), EVar(w)) =>
+            val sign1 = st(v)
+            val sign2 = st(w)
+            (sign1, sign2) match
+              case (Bottom, _) | (_, Bottom) => Map.empty
+              case (Zero, Zero)              => Map.empty
+              case _                         => st
+          case _ => super.transfer(c, st)
+      case _ => super.transfer(c, st)
 }
