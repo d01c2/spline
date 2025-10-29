@@ -6,7 +6,7 @@ import spline.utils.*
 import spline.analyzer.sign.Sign.*
 
 given SignDomain: AbsDomain[Sign] with {
-  def bot = Bottom // canonical bottom
+  def bot = Bottom
   def top = Top
 
   extension (sign: Sign) {
