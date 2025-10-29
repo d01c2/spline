@@ -4,8 +4,7 @@ import spline.analyzer.*
 import spline.frontend.*
 import spline.utils.*
 import spline.analyzer.sign.Sign.*
-// TODO: Implement advanced abstract tests in Ch 4.6
-// TODO: Implement advanced iteration techniques in Ch 4.7
+
 given SignDomain: AbsDomain[Sign] with {
   def bot = Bottom // canonical bottom
   def top = Top
