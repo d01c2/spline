@@ -80,11 +80,11 @@ given IntervalDomain: AbsDomain[Interval] with {
       case CCmp(cmp, e1, e2) =>
         (cmp, e1, e2) match
           case (Cmp.Leq, EVar(v), ENum(k)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             if a <= k then st.updated(v, Interval(a, min(b, k)))
             else Map.empty
           case (Cmp.Leq, EVar(v), EVar(w)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             val Interval(c, d) = st(w)
             if a <= d then
               st ++ Map(
@@ -93,11 +93,11 @@ given IntervalDomain: AbsDomain[Interval] with {
               )
             else Map.empty
           case (Cmp.Geq, EVar(v), ENum(k)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             if b >= k then st.updated(v, Interval(max(a, k), b))
             else Map.empty
           case (Cmp.Geq, EVar(v), EVar(w)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             val Interval(c, d) = st(w)
             if b >= c then
               st ++ Map(
@@ -106,11 +106,11 @@ given IntervalDomain: AbsDomain[Interval] with {
               )
             else Map.empty
           case (Cmp.Lt, EVar(v), ENum(k)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             if a < k then st.updated(v, Interval(a, min(b, k - 1)))
             else Map.empty
           case (Cmp.Lt, EVar(v), EVar(w)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             val Interval(c, d) = st(w)
             if a < d then
               st ++ Map(
@@ -119,11 +119,11 @@ given IntervalDomain: AbsDomain[Interval] with {
               )
             else Map.empty
           case (Cmp.Gt, EVar(v), ENum(k)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             if b > k then st.updated(v, Interval(max(a, k + 1), b))
             else Map.empty
           case (Cmp.Gt, EVar(v), EVar(w)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             val Interval(c, d) = st(w)
             if b > c then
               st ++ Map(
@@ -132,22 +132,22 @@ given IntervalDomain: AbsDomain[Interval] with {
               )
             else Map.empty
           case (Cmp.Eq, EVar(v), ENum(k)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             if a <= k && k <= b then st.updated(v, Interval(k, k))
             else Map.empty
           case (Cmp.Eq, EVar(v), EVar(w)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             val Interval(c, d) = st(w)
             if max(a, c) <= min(b, d) then
               val e = Interval(max(a, c), min(b, d))
               st ++ Map(v -> e, w -> e)
             else Map.empty
           case (Cmp.Neq, EVar(v), ENum(k)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             if a == b && a == k then Map.empty
             else st
           case (Cmp.Neq, EVar(v), EVar(w)) =>
-            val Interval(a, b) = st(v)
+            val Interval(a, b) = st.getOrElse(v, top)
             val Interval(c, d) = st(w)
             if a == b && c == d && a == c then Map.empty
             else st

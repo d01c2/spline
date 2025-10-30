@@ -45,17 +45,25 @@ trait AbsDomain[Elem] {
   extension (x: AbsState) {
     // partial order
     def ⊑(y: AbsState): Boolean =
-      (x.keySet ++ y.keySet).forall(k => x(k) ⊑ y(k))
+      (x.keySet ++ y.keySet).forall(k =>
+        x.getOrElse(k, top) ⊑ y.getOrElse(k, top),
+      )
 
     // join and meet operations
     def ⊔(y: AbsState): AbsState =
-      (x.keySet ++ y.keySet).map(k => k -> (x(k) ⊔ y(k))).toMap
+      (x.keySet ++ y.keySet)
+        .map(k => k -> (x.getOrElse(k, top) ⊔ y.getOrElse(k, top)))
+        .toMap
     def ⊓(y: AbsState): AbsState =
-      (x.keySet ++ y.keySet).map(k => k -> (x(k) ⊓ y(k))).toMap
+      (x.keySet ++ y.keySet)
+        .map(k => k -> (x.getOrElse(k, top) ⊓ y.getOrElse(k, top)))
+        .toMap
 
     // widening operation
     def ▽(y: AbsState): AbsState =
-      (x.keySet ++ y.keySet).map(k => k -> (x(k) ▽ y(k))).toMap
+      (x.keySet ++ y.keySet)
+        .map(k => k -> (x.getOrElse(k, top) ▽ y.getOrElse(k, top)))
+        .toMap
   }
 
   // abstract transfer functions
@@ -65,7 +73,7 @@ trait AbsDomain[Elem] {
   def absBOp(bop: BOp, v1: AbsValue, v2: AbsValue): AbsValue
 
   def transfer(e: Expr, st: AbsState): AbsValue = e match
-    case EVar(v)           => st(v)
+    case EVar(v)           => st.getOrElse(v, top)
     case ENum(c)           => alpha(Set(c))
     case ENeg(e)           => absNeg(transfer(e, st))
     case EBOp(bop, e1, e2) => absBOp(bop, transfer(e1, st), transfer(e2, st))
